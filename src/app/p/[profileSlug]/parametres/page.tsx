@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getProfileBySlug, updateProfile } from "@/lib/actions/profiles.actions";
 import { ProfileForm } from "@/components/profiles/profile-form";
+import { LogoUploader } from "@/components/profiles/logo-uploader";
 import type { ProfileFormValues } from "@/lib/validations/profile.schema";
 
 export default async function ParametresPage({
@@ -54,6 +55,9 @@ export default async function ParametresPage({
       <p className="mb-6 text-muted-foreground">
         Identité de facturation, mentions légales et réglages de déclaration.
       </p>
+      <div className="mb-6">
+        <LogoUploader profileId={profile.id} currentLogoKey={profile.logoKey} />
+      </div>
       <ProfileForm
         defaultValues={defaultValues}
         onSubmit={submitUpdate}
