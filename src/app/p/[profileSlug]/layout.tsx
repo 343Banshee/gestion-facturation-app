@@ -17,7 +17,7 @@ export default async function ProfileLayout({
   }
 
   return (
-    <div className="flex flex-1">
+    <div className="flex flex-1 flex-col md:flex-row">
       <Sidebar profileSlug={profile.slug} profileName={profile.name} />
       <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
