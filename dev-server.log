@@ -1,0 +1,20 @@
+
+> gestion-facturation-app@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.39:3000
+- Environments: .env
+✓ Ready in 209ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+
+ GET / 200 in 1559ms (next.js: 1405ms, application-code: 154ms)
+ GET /p/dev-web/dashboard 200 in 450ms (next.js: 397ms, application-code: 54ms)
+✓ Compiled in 21ms
+ GET /profiles/new 200 in 628ms (next.js: 547ms, application-code: 81ms)
+ GET /p/dev-web/parametres 200 in 494ms (next.js: 459ms, application-code: 35ms)
