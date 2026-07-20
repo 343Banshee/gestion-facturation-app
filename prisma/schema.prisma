@@ -1,0 +1,277 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Language {
+  FR
+  EN
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CONVERTED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIALLY_PAID
+  PAID
+  CANCELLED
+}
+
+enum DocumentType {
+  QUOTE
+  INVOICE
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CHECK
+  CASH
+  CARD
+  OTHER
+}
+
+enum UrssafPeriodicity {
+  MONTHLY
+  QUARTERLY
+}
+
+model Profile {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String
+
+  ownerId String?
+
+  // Identité de facturation (émetteur)
+  companyName  String
+  addressLine1 String
+  addressLine2 String?
+  postalCode   String
+  city         String
+  country      String  @default("France")
+  siret        String
+  apeCode      String?
+  email        String
+  phone        String?
+  logoKey      String?
+
+  // Paiement
+  iban                     String?
+  bic                      String?
+  otherPaymentInstructions String?
+
+  // Mentions légales
+  vatMention              String  @default("TVA non applicable, art. 293B du CGI")
+  latePaymentPenaltyText  String  @default("Pénalités de retard : taux BCE + 10 points. Indemnité forfaitaire pour frais de recouvrement : 40 €.")
+  additionalLegalMentions String?
+
+  // Comportement documents
+  defaultLanguage        Language @default(FR)
+  quoteNumberPrefix      String   @default("DEV")
+  invoiceNumberPrefix    String   @default("FAC")
+  quoteValidityDays      Int      @default(30)
+  defaultPaymentTermDays Int      @default(30)
+
+  // URSSAF
+  urssafPeriodicity           UrssafPeriodicity @default(QUARTERLY)
+  urssafRatePresetKey          String?
+  urssafCotisationRateBps      Int     @default(0)
+  versementLiberatoireEnabled  Boolean @default(false)
+  versementLiberatoireRateBps  Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clients          Client[]
+  serviceItems     ServiceItem[]
+  quotes           Quote[]
+  invoices         Invoice[]
+  documentCounters DocumentCounter[]
+}
+
+// Compteur atomique — garantit une numérotation séquentielle sans trou par profil/type/année
+model DocumentCounter {
+  id           String       @id @default(cuid())
+  profileId    String
+  profile      Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  documentType DocumentType
+  year         Int
+  lastNumber   Int          @default(0)
+
+  @@unique([profileId, documentType, year])
+}
+
+model Client {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  name              String
+  contactName       String?
+  addressLine1      String
+  addressLine2      String?
+  postalCode        String
+  city              String
+  country           String   @default("France")
+  email             String?
+  phone             String?
+  siret             String?
+  preferredLanguage Language @default(FR)
+  notes             String?
+  archived          Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quotes   Quote[]
+  invoices Invoice[]
+
+  @@index([profileId])
+}
+
+model ServiceItem {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  name           String
+  description    String?
+  unitPriceCents Int
+  unit           String  @default("unité")
+  category       String?
+  archived       Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quoteLines   QuoteLine[]
+  invoiceLines InvoiceLine[]
+
+  @@index([profileId])
+}
+
+model Quote {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id])
+
+  number     String
+  status     QuoteStatus @default(DRAFT)
+  issueDate  DateTime
+  validUntil DateTime
+  language   Language    @default(FR)
+
+  notes         String?
+  termsOverride String?
+
+  subtotalAmountCents Int @default(0)
+
+  convertedInvoiceId String?  @unique
+  convertedInvoice   Invoice? @relation("QuoteConversion", fields: [convertedInvoiceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lines QuoteLine[]
+
+  @@index([profileId, status])
+}
+
+model QuoteLine {
+  id            String       @id @default(cuid())
+  quoteId       String
+  quote         Quote        @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  serviceItemId String?
+  serviceItem   ServiceItem? @relation(fields: [serviceItemId], references: [id])
+
+  description    String
+  quantity       Float  @default(1)
+  unitPriceCents Int
+  unit           String
+  position       Int
+  lineTotalCents Int
+}
+
+model Invoice {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id])
+
+  number    String
+  status    InvoiceStatus @default(DRAFT)
+  issueDate DateTime
+  dueDate   DateTime
+  language  Language      @default(FR)
+
+  notes         String?
+  termsOverride String?
+
+  sourceQuoteId String?
+  sourceQuote   Quote? @relation("QuoteConversion")
+
+  subtotalAmountCents Int @default(0)
+
+  cancelledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lines    InvoiceLine[]
+  payments Payment[]
+
+  @@index([profileId, status])
+  @@index([profileId, dueDate])
+}
+
+model InvoiceLine {
+  id            String       @id @default(cuid())
+  invoiceId     String
+  invoice       Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  serviceItemId String?
+  serviceItem   ServiceItem? @relation(fields: [serviceItemId], references: [id])
+
+  description    String
+  quantity       Float  @default(1)
+  unitPriceCents Int
+  unit           String
+  position       Int
+  lineTotalCents Int
+}
+
+// Un encaissement réel — c'est ce modèle, pas un simple champ Invoice.datePaid, qui sert de
+// source de vérité au calcul URSSAF (une facture peut être payée en plusieurs fois, à des
+// dates différentes, potentiellement à cheval sur deux périodes de déclaration).
+model Payment {
+  id        String  @id @default(cuid())
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  amountCents Int
+  paidAt      DateTime
+  method      PaymentMethod @default(BANK_TRANSFER)
+  notes       String?
+
+  createdAt DateTime @default(now())
+
+  @@index([invoiceId])
+  @@index([paidAt])
+}
