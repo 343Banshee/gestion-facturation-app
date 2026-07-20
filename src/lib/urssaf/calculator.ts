@@ -1,5 +1,23 @@
 import { prisma } from "@/lib/prisma";
 
+export function calculateUrssafAmounts(
+  totalEncaisseCents: number,
+  cotisationRateBps: number,
+  versementLiberatoireEnabled: boolean,
+  versementLiberatoireRateBps: number | null,
+): { cotisationsCents: number; versementLiberatoireCents: number; totalACharge: number } {
+  const cotisationsCents = Math.round((totalEncaisseCents * cotisationRateBps) / 10_000);
+  const versementLiberatoireCents = versementLiberatoireEnabled
+    ? Math.round((totalEncaisseCents * (versementLiberatoireRateBps ?? 0)) / 10_000)
+    : 0;
+
+  return {
+    cotisationsCents,
+    versementLiberatoireCents,
+    totalACharge: cotisationsCents + versementLiberatoireCents,
+  };
+}
+
 export type UrssafDeclaration = {
   periodStart: Date;
   periodEnd: Date;
@@ -45,12 +63,12 @@ export async function computeUrssafDeclaration(
   const totalEncaisseCents = payments.reduce((sum, p) => sum + p.amountCents, 0);
   const totalFactureCents = invoicedInPeriod.reduce((sum, i) => sum + i.subtotalAmountCents, 0);
 
-  const cotisationsCents = Math.round(
-    (totalEncaisseCents * profile.urssafCotisationRateBps) / 10_000,
+  const { cotisationsCents, versementLiberatoireCents, totalACharge } = calculateUrssafAmounts(
+    totalEncaisseCents,
+    profile.urssafCotisationRateBps,
+    profile.versementLiberatoireEnabled,
+    profile.versementLiberatoireRateBps,
   );
-  const versementLiberatoireCents = profile.versementLiberatoireEnabled
-    ? Math.round((totalEncaisseCents * (profile.versementLiberatoireRateBps ?? 0)) / 10_000)
-    : 0;
 
   return {
     periodStart,
@@ -66,6 +84,6 @@ export async function computeUrssafDeclaration(
     totalFactureCents,
     cotisationsCents,
     versementLiberatoireCents,
-    totalACharge: cotisationsCents + versementLiberatoireCents,
+    totalACharge,
   };
 }

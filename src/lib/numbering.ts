@@ -1,6 +1,10 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { DocumentType } from "@/generated/prisma/enums";
 
+export function formatDocumentNumber(prefix: string, year: number, sequence: number): string {
+  return `${prefix}-${year}-${String(sequence).padStart(4, "0")}`;
+}
+
 export async function getNextDocumentNumber(
   tx: Prisma.TransactionClient,
   profileId: string,
@@ -16,5 +20,5 @@ export async function getNextDocumentNumber(
     create: { profileId, documentType, year, lastNumber: 1 },
   });
 
-  return `${prefix}-${year}-${String(counter.lastNumber).padStart(4, "0")}`;
+  return formatDocumentNumber(prefix, year, counter.lastNumber);
 }
