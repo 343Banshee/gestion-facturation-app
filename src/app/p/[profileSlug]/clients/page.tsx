@@ -44,13 +44,14 @@ export default async function ClientsPage({
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
+            nativeButton={false}
             render={
               <Link href={`/p/${profileSlug}/clients${showArchived ? "" : "?archived=1"}`} />
             }
           >
             {showArchived ? "Voir les actifs" : "Voir les archivés"}
           </Button>
-          <Button render={<Link href={`/p/${profileSlug}/clients/new`} />}>
+          <Button nativeButton={false} render={<Link href={`/p/${profileSlug}/clients/new`} />}>
             <Plus className="h-4 w-4" />
             Nouveau client
           </Button>

@@ -45,6 +45,7 @@ export default async function CataloguePage({
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
+            nativeButton={false}
             render={
               <Link
                 href={`/p/${profileSlug}/catalogue${showArchived ? "" : "?archived=1"}`}
@@ -53,7 +54,7 @@ export default async function CataloguePage({
           >
             {showArchived ? "Voir les actives" : "Voir les archivées"}
           </Button>
-          <Button render={<Link href={`/p/${profileSlug}/catalogue/new`} />}>
+          <Button nativeButton={false} render={<Link href={`/p/${profileSlug}/catalogue/new`} />}>
             <Plus className="h-4 w-4" />
             Nouvelle prestation
           </Button>

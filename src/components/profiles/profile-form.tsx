@@ -151,6 +151,7 @@ export function ProfileForm({
               <div className="space-y-1.5">
                 <Label>Langue par défaut des documents</Label>
                 <Select
+                  items={{ FR: "Français", EN: "English" }}
                   value={defaultLanguage}
                   onValueChange={(v) => setValue("defaultLanguage", v as "FR" | "EN")}
                 >
@@ -325,6 +326,7 @@ export function ProfileForm({
               <div className="space-y-1.5">
                 <Label>Périodicité de déclaration</Label>
                 <Select
+                  items={{ MONTHLY: "Mensuelle", QUARTERLY: "Trimestrielle" }}
                   value={urssafPeriodicity}
                   onValueChange={(v) =>
                     setValue("urssafPeriodicity", v as "MONTHLY" | "QUARTERLY")
@@ -341,7 +343,15 @@ export function ProfileForm({
               </div>
               <div className="space-y-1.5">
                 <Label>Préréglage de taux</Label>
-                <Select onValueChange={applyPreset}>
+                <Select
+                  items={Object.fromEntries(
+                    URSSAF_RATE_PRESETS.map((preset) => [
+                      preset.key,
+                      `${preset.label} — ${(preset.cotisationRateBps / 100).toFixed(2)}%`,
+                    ]),
+                  )}
+                  onValueChange={applyPreset}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Choisir un préréglage" />
                   </SelectTrigger>

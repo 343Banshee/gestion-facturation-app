@@ -123,6 +123,7 @@ export function ClientForm({
           <div className="space-y-1.5">
             <Label>Langue préférée des documents</Label>
             <Select
+              items={{ FR: "Français", EN: "English" }}
               value={preferredLanguage}
               onValueChange={(v) => setValue("preferredLanguage", v as "FR" | "EN")}
             >
