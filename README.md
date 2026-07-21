@@ -36,6 +36,25 @@ Deux options selon comment tu l'as reçu :
 Note le chemin du dossier obtenu (ex. `Bureau/gestion-facturation-app`), tu en as
 besoin juste après.
 
+### Raccourci en un clic (le plus simple)
+
+Le dossier contient un fichier `Demarrer.command` (Mac) ou `Demarrer.bat` (Windows) —
+double-clique dessus. Il installe tout ce qu'il faut la première fois (peut prendre
+1-2 minutes), puis lance l'app et ouvre ton navigateur automatiquement. Les fois
+suivantes, un double-clic suffit pour tout relancer directement.
+
+- **Mac** : si macOS refuse de l'ouvrir ("développeur non identifié"), fais un
+  clic droit sur `Demarrer.command` → **Ouvrir** → confirme. Ça ne sera demandé
+  qu'une seule fois.
+- **Windows** : si Windows affiche un avertissement SmartScreen, clique sur
+  **Informations complémentaires** → **Exécuter quand même**.
+
+Pour arrêter l'app : ferme la fenêtre noire (terminal) qui s'est ouverte, ou clique
+dedans et appuie sur Ctrl+C.
+
+Si tu préfères comprendre ce qui se passe en coulisses (ou que le raccourci ne
+fonctionne pas chez toi), suis les étapes manuelles ci-dessous à la place.
+
 ### 3. Ouvrir un terminal dans le dossier
 
 - **Mac** : ouvre le Terminal (Cmd+Espace → `Terminal`), tape `cd ` (avec l'espace,
