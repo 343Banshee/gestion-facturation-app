@@ -83,7 +83,12 @@ besoin de refaire `npm install` ni les étapes 1-3).
 ### Lancer / couper l'app au quotidien
 
 **Pour lancer l'app :**
-1. Ouvre un terminal dans le dossier du projet (voir étape 3 ci-dessus)
+1. Ouvre un terminal dans le dossier du projet (voir étape 3 ci-dessus) — **c'est
+   l'erreur la plus fréquente** : si ton terminal s'ouvre ailleurs (ex. par habitude,
+   il s'ouvre toujours dans ton dossier personnel), il faut d'abord t'y déplacer.
+   Pour vérifier que tu es au bon endroit, tape `ls` (Mac) ou `dir` (Windows) : tu dois
+   voir des fichiers comme `package.json` et `README.md` dans la liste. Si tu ne les
+   vois pas, tu n'es pas dans le bon dossier — refais l'étape 3.
 2. Tape `npm run dev` et appuie sur Entrée
 3. Va sur [http://localhost:3000](http://localhost:3000) dans ton navigateur
 
@@ -104,6 +109,11 @@ relances `npm run dev`.
 
 ### Problèmes fréquents
 
+- **`npm error enoent Could not read package.json`** → tu as lancé la commande depuis
+  le mauvais dossier (le terminal ne s'est pas ouvert dans le dossier du projet, ou tu
+  as ouvert un nouveau terminal entre-temps). Refais l'étape 3 pour ouvrir un terminal
+  directement dans le dossier du projet, vérifie avec `ls` (Mac) / `dir` (Windows) que
+  tu vois bien `package.json`, puis relance la commande.
 - **`command not found: node` / `node n'est pas reconnu`** → Node.js n'est pas
   installé ou le terminal a été ouvert avant l'installation ; ferme et rouvre le
   terminal, ou réinstalle Node.js (étape 1).
