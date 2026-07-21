@@ -80,6 +80,28 @@ navigateur. Tu devrais voir l'écran de sélection de profil — clique sur
 Pour les fois suivantes, il suffit de refaire `npm run dev` dans ce dossier (plus
 besoin de refaire `npm install` ni les étapes 1-3).
 
+### Lancer / couper l'app au quotidien
+
+**Pour lancer l'app :**
+1. Ouvre un terminal dans le dossier du projet (voir étape 3 ci-dessus)
+2. Tape `npm run dev` et appuie sur Entrée
+3. Va sur [http://localhost:3000](http://localhost:3000) dans ton navigateur
+
+**Pour couper l'app :**
+- Retourne dans la fenêtre de terminal où elle tourne (celle qui affiche les logs) et
+  appuie sur **Ctrl+C**. C'est tout — le serveur s'arrête immédiatement.
+- Tu peux aussi simplement fermer la fenêtre du terminal, ça coupe l'app en même temps.
+- Si tu as fermé le terminal sans faire Ctrl+C et que l'app tourne encore en arrière-plan
+  (le navigateur affiche toujours le site alors qu'aucun terminal n'est ouvert), tu peux
+  la forcer à s'arrêter :
+  - **Mac/Linux** : `kill $(lsof -ti:3000)` dans un nouveau terminal
+  - **Windows** : `netstat -ano | findstr :3000` pour trouver le PID (dernier nombre de
+    la ligne), puis `taskkill /PID <le-numéro> /F`
+
+Fermer l'app ne supprime **jamais** tes données (clients, devis, factures) — elles
+restent dans le fichier `dev.db` du dossier, prêtes pour la prochaine fois que tu
+relances `npm run dev`.
+
 ### Problèmes fréquents
 
 - **`command not found: node` / `node n'est pas reconnu`** → Node.js n'est pas
